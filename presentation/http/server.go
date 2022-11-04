@@ -1,18 +1,33 @@
-package presentation
+package http
 
 import (
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/Marcel-MD/distributed-datastore/domain"
+	"github.com/Marcel-MD/distributed-datastore/presentation/cfg"
+	"github.com/Marcel-MD/distributed-datastore/presentation/tcp"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 )
 
-func InitRouter() *mux.Router {
+func ListenAndServe() {
+	config := cfg.GetConfig()
+	port := config.Current.HttpPort
+
+	r := initRouter()
+
+	log.Info().Msg("Listening on port " + port)
+
+	log.Fatal().Err(http.ListenAndServe(":"+port, r)).Msg("Error listening on port " + port)
+}
+
+func initRouter() *mux.Router {
 	r := mux.NewRouter()
 
-	s := domain.NewStore()
+	s := domain.GetStore()
+
+	c := tcp.GetClient()
 
 	r.HandleFunc("/{key}", func(w http.ResponseWriter, r *http.Request) {
 
@@ -36,7 +51,7 @@ func InitRouter() *mux.Router {
 		vars := mux.Vars(r)
 		key := vars["key"]
 
-		value, err := ioutil.ReadAll(r.Body)
+		value, err := io.ReadAll(r.Body)
 
 		if err != nil {
 			log.Error().Err(err).Msg("Error reading body")
@@ -53,6 +68,8 @@ func InitRouter() *mux.Router {
 			return
 		}
 
+		c.Set(key, value)
+
 		w.WriteHeader(http.StatusCreated)
 
 	}).Methods("POST")
@@ -68,6 +85,8 @@ func InitRouter() *mux.Router {
 			w.WriteHeader(http.StatusNotFound)
 			return
 		}
+
+		c.Delete(key)
 
 		w.WriteHeader(http.StatusNoContent)
 

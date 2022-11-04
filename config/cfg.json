@@ -1,0 +1,22 @@
+{
+    "current": {
+        "is_leader": true,
+        "host": "datastore-0",
+        "http_port": "8080",
+        "tcp_port": "8070"
+    },
+    "instances": [
+        {
+            "is_leader": false,
+            "host": "datastore-1",
+            "http_port": "8081",
+            "tcp_port": "8071"
+        },
+        {
+            "is_leader": false,
+            "host": "datastore-2",
+            "http_port": "8082",
+            "tcp_port": "8072"
+        }
+    ]
+}

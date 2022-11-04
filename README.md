@@ -7,5 +7,5 @@ Laboratory work on network programming.
 ## Run Application
 
 ```bash
-$ go run .
+$ docker compose up --build
 ```

@@ -3,6 +3,8 @@ package domain
 import (
 	"errors"
 	"sync"
+
+	"github.com/rs/zerolog/log"
 )
 
 type Store interface {
@@ -15,12 +17,14 @@ type store struct {
 	data map[string][]byte
 }
 
-var once = sync.Once{}
+var once sync.Once
 var instance Store
 
-func NewStore() Store {
+func GetStore() Store {
 
 	once.Do(func() {
+		log.Info().Msg("Initializing store")
+
 		instance = &store{
 			data: make(map[string][]byte),
 		}
@@ -30,6 +34,7 @@ func NewStore() Store {
 }
 
 func (s *store) Get(key string) ([]byte, error) {
+	log.Info().Msgf("Getting key %s", key)
 
 	if value, ok := s.data[key]; ok {
 		return value, nil
@@ -39,11 +44,14 @@ func (s *store) Get(key string) ([]byte, error) {
 }
 
 func (s *store) Set(key string, value []byte) error {
+	log.Info().Msgf("Setting key %s", key)
+
 	s.data[key] = value
 	return nil
 }
 
 func (s *store) Delete(key string) error {
+	log.Info().Msgf("Deleting key %s", key)
 
 	if _, ok := s.data[key]; ok {
 		delete(s.data, key)
