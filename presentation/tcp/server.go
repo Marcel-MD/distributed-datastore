@@ -70,17 +70,6 @@ func handleConnection(conn net.Conn) {
 			if err != nil {
 				log.Err(err).Msg("Error deleting value")
 			}
-
-		case models.GET:
-			value, err := s.Get(a.Key)
-			if err != nil {
-				log.Err(err).Msg("Error getting value")
-			}
-
-			_, err = conn.Write(value)
-			if err != nil {
-				log.Err(err).Msg("Error writing to connection")
-			}
 		}
 	}
 }

@@ -19,6 +19,7 @@ type Instance struct {
 	Host     string `json:"host"`
 	HttpPort string `json:"http_port"`
 	TcpPort  string `json:"tcp_port"`
+	UdpPort  string `json:"udp_port"`
 }
 
 var c Config

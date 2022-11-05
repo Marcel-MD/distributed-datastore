@@ -11,46 +11,49 @@ import (
 )
 
 type Client interface {
-	Set(key string, value []byte)
-	Delete(key string)
+	Set(key string, value []byte) error
+	Delete(key string) error
 }
 
 type client struct {
 	connections map[string]net.Conn
 }
 
-func (c *client) Set(key string, value []byte) {
+func (c *client) Set(key string, value []byte) error {
 	action := models.Action{
 		Command: models.SET,
 		Key:     key,
 		Value:   value,
 	}
 
-	c.broadcast(action)
+	return c.broadcast(action)
 }
 
-func (c *client) Delete(key string) {
+func (c *client) Delete(key string) error {
 	action := models.Action{
 		Command: models.DELETE,
 		Key:     key,
 	}
 
-	c.broadcast(action)
+	return c.broadcast(action)
 }
 
-func (c *client) broadcast(action models.Action) {
+func (c *client) broadcast(action models.Action) error {
 	data, err := json.Marshal(action)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to marshal action")
-		return
+		return err
 	}
 
 	for host, conn := range c.connections {
 		_, err := conn.Write(data)
 		if err != nil {
 			log.Error().Err(err).Msgf("Failed to write to connection %s", host)
+			return err
 		}
 	}
+
+	return nil
 }
 
 var c Client

@@ -1,5 +1,5 @@
 services:
-  datastore-0:
+  store-0:
     build:
       context: .
       dockerfile: Dockerfile
@@ -8,11 +8,12 @@ services:
     ports:
       - "8080:8080"
       - "8070:8070"
+      - "8060:8060"
     depends_on:
-      - datastore-1
-      - datastore-2
+      - store-1
+      - store-2
 
-  datastore-1:
+  store-1:
     build:
       context: .
       dockerfile: Dockerfile
@@ -21,8 +22,9 @@ services:
     ports:
       - "8081:8081"
       - "8071:8071"
+      - "8061:8061"
 
-  datastore-2:
+  store-2:
     build:
       context: .
       dockerfile: Dockerfile
@@ -31,7 +33,8 @@ services:
     ports:
       - "8082:8082"
       - "8072:8072"
+      - "8062:8062"
 
 networks:
   default:
-    name: datastore-network
+    name: datastore

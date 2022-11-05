@@ -7,6 +7,7 @@ import (
 	"github.com/Marcel-MD/distributed-datastore/domain"
 	"github.com/Marcel-MD/distributed-datastore/presentation/cfg"
 	"github.com/Marcel-MD/distributed-datastore/presentation/tcp"
+	"github.com/Marcel-MD/distributed-datastore/presentation/udp"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 )
@@ -27,14 +28,16 @@ func initRouter() *mux.Router {
 
 	s := domain.GetStore()
 
-	c := tcp.GetClient()
+	tcpC := tcp.GetClient()
+
+	udpC := udp.GetClient()
 
 	r.HandleFunc("/{key}", func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
 		key := vars["key"]
 
-		value, err := s.Get(key)
+		value, err := udpC.Get(key)
 		if err != nil {
 			log.Error().Err(err).Msg("Error getting key")
 			w.WriteHeader(http.StatusNotFound)
@@ -68,7 +71,7 @@ func initRouter() *mux.Router {
 			return
 		}
 
-		c.Set(key, value)
+		tcpC.Set(key, value)
 
 		w.WriteHeader(http.StatusCreated)
 
@@ -86,7 +89,7 @@ func initRouter() *mux.Router {
 			return
 		}
 
-		c.Delete(key)
+		tcpC.Delete(key)
 
 		w.WriteHeader(http.StatusNoContent)
 
