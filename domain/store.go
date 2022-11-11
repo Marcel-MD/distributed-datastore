@@ -10,6 +10,7 @@ import (
 type Store interface {
 	Get(key string) ([]byte, error)
 	Set(key string, value []byte) error
+	Update(key string, value []byte) error
 	Delete(key string) error
 }
 
@@ -46,8 +47,23 @@ func (s *store) Get(key string) ([]byte, error) {
 func (s *store) Set(key string, value []byte) error {
 	log.Info().Msgf("Setting key %s", key)
 
+	if _, ok := s.data[key]; ok {
+		return errors.New("key already exists")
+	}
+
 	s.data[key] = value
 	return nil
+}
+
+func (s *store) Update(key string, value []byte) error {
+	log.Info().Msgf("Updating key %s", key)
+
+	if _, ok := s.data[key]; ok {
+		s.data[key] = value
+		return nil
+	}
+
+	return errors.New("key not found")
 }
 
 func (s *store) Delete(key string) error {

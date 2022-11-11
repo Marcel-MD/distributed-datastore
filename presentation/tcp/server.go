@@ -5,7 +5,6 @@ import (
 	"net"
 
 	"github.com/Marcel-MD/distributed-datastore/domain"
-	"github.com/Marcel-MD/distributed-datastore/models"
 	"github.com/Marcel-MD/distributed-datastore/presentation/cfg"
 	"github.com/rs/zerolog/log"
 )
@@ -51,7 +50,7 @@ func handleConnection(conn net.Conn) {
 
 		buffer = buffer[:n]
 
-		var a models.Action
+		var a Action
 		err = json.Unmarshal(buffer, &a)
 		if err != nil {
 			log.Err(err).Msg("Error unmarshaling action")
@@ -59,17 +58,38 @@ func handleConnection(conn net.Conn) {
 		}
 
 		switch a.Command {
-		case models.SET:
+		case GET:
+			value, err := s.Get(a.Key)
+			if err != nil {
+				log.Err(err).Msg("Error getting value from store")
+				conn.Write([]byte(ERROR))
+				continue
+			}
+			conn.Write(value)
+
+		case SET:
 			err = s.Set(a.Key, a.Value)
 			if err != nil {
 				log.Err(err).Msg("Error setting value")
+				conn.Write([]byte(ERROR))
 			}
+			conn.Write([]byte(SET))
 
-		case models.DELETE:
+		case UPDATE:
+			err = s.Update(a.Key, a.Value)
+			if err != nil {
+				log.Err(err).Msg("Error updating value")
+				conn.Write([]byte(ERROR))
+			}
+			conn.Write([]byte(UPDATE))
+
+		case DELETE:
 			err = s.Delete(a.Key)
 			if err != nil {
 				log.Err(err).Msg("Error deleting value")
+				conn.Write([]byte(ERROR))
 			}
+			conn.Write([]byte(DELETE))
 		}
 	}
 }

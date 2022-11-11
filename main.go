@@ -6,7 +6,6 @@ import (
 	"github.com/Marcel-MD/distributed-datastore/presentation/cfg"
 	"github.com/Marcel-MD/distributed-datastore/presentation/http"
 	"github.com/Marcel-MD/distributed-datastore/presentation/tcp"
-	"github.com/Marcel-MD/distributed-datastore/presentation/udp"
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
@@ -19,7 +18,6 @@ func main() {
 	if config.Current.IsLeader {
 		http.ListenAndServe()
 	} else {
-		go udp.ListenAndServe()
 		tcp.ListenAndServe()
 	}
 }

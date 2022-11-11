@@ -1,4 +1,4 @@
-package models
+package tcp
 
 type Action struct {
 	Key     string `json:"key"`
@@ -9,5 +9,7 @@ type Action struct {
 const (
 	GET    = "GET"
 	SET    = "SET"
+	UPDATE = "UPDATE"
 	DELETE = "DELETE"
+	ERROR  = "ERROR"
 )

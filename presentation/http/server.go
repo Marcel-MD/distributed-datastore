@@ -7,7 +7,6 @@ import (
 	"github.com/Marcel-MD/distributed-datastore/domain"
 	"github.com/Marcel-MD/distributed-datastore/presentation/cfg"
 	"github.com/Marcel-MD/distributed-datastore/presentation/tcp"
-	"github.com/Marcel-MD/distributed-datastore/presentation/udp"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 )
@@ -28,24 +27,28 @@ func initRouter() *mux.Router {
 
 	s := domain.GetStore()
 
-	tcpC := tcp.GetClient()
-
-	udpC := udp.GetClient()
+	c := tcp.GetClient()
 
 	r.HandleFunc("/{key}", func(w http.ResponseWriter, r *http.Request) {
 
 		vars := mux.Vars(r)
 		key := vars["key"]
 
-		value, err := udpC.Get(key)
-		if err != nil {
-			log.Error().Err(err).Msg("Error getting key")
-			w.WriteHeader(http.StatusNotFound)
-			w.Write([]byte("Key not found"))
+		value, err := c.Get(key)
+		if err == nil {
+			w.Write(value)
 			return
 		}
 
-		w.Write(value)
+		value, err = s.Get(key)
+		if err == nil {
+			w.Write(value)
+			return
+		}
+
+		log.Error().Err(err).Msg("Error getting key")
+		w.WriteHeader(http.StatusNotFound)
+		w.Write([]byte("Key not found"))
 
 	}).Methods("GET")
 
@@ -71,11 +74,39 @@ func initRouter() *mux.Router {
 			return
 		}
 
-		tcpC.Set(key, value)
+		c.Set(key, value)
 
 		w.WriteHeader(http.StatusCreated)
 
 	}).Methods("POST")
+
+	r.HandleFunc("/{key}", func(w http.ResponseWriter, r *http.Request) {
+
+		vars := mux.Vars(r)
+		key := vars["key"]
+
+		value, err := io.ReadAll(r.Body)
+
+		if err != nil {
+			log.Error().Err(err).Msg("Error reading body")
+			w.WriteHeader(http.StatusBadRequest)
+			w.Write([]byte("Error reading body"))
+			return
+		}
+
+		err = s.Update(key, value)
+		if err != nil {
+			log.Error().Err(err).Msg("Error setting key")
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Write([]byte("Error setting key"))
+			return
+		}
+
+		c.Update(key, value)
+
+		w.WriteHeader(http.StatusCreated)
+
+	}).Methods("PUT")
 
 	r.HandleFunc("/{key}", func(w http.ResponseWriter, r *http.Request) {
 
@@ -89,7 +120,7 @@ func initRouter() *mux.Router {
 			return
 		}
 
-		tcpC.Delete(key)
+		c.Delete(key)
 
 		w.WriteHeader(http.StatusNoContent)
 
