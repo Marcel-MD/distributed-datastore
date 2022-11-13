@@ -19,7 +19,7 @@ func ListenAndServe() {
 
 	log.Info().Msg("Listening on port " + port)
 
-	log.Fatal().Err(http.ListenAndServe(":"+port, r)).Msg("Error listening on port " + port)
+	log.Fatal().Err(http.ListenAndServe(port, r)).Msg("Error listening on port " + port)
 }
 
 func initRouter() *mux.Router {

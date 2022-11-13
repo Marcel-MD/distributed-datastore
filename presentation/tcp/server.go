@@ -13,7 +13,7 @@ func ListenAndServe() {
 	config := cfg.GetConfig()
 	port := config.Current.TcpPort
 
-	l, err := net.Listen("tcp", ":"+port)
+	l, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Err(err).Msg("Error listening on port " + port)
 		return

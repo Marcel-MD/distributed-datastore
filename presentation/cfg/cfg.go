@@ -10,8 +10,8 @@ import (
 )
 
 type Config struct {
-	Current   Instance   `json:"current"`
-	Instances []Instance `json:"instances"`
+	Current   Instance
+	Instances map[string]Instance
 }
 
 type Instance struct {
@@ -19,7 +19,6 @@ type Instance struct {
 	Host     string `json:"host"`
 	HttpPort string `json:"http_port"`
 	TcpPort  string `json:"tcp_port"`
-	UdpPort  string `json:"udp_port"`
 }
 
 var c Config
@@ -34,8 +33,29 @@ func GetConfig() Config {
 		defer file.Close()
 
 		byteValue, _ := io.ReadAll(file)
-		json.Unmarshal(byteValue, &c)
+
+		var current Instance
+		json.Unmarshal(byteValue, &current)
+
+		c.Current = current
+		c.Instances = make(map[string]Instance)
 	})
 
 	return c
+}
+
+func (c *Config) AddInstance(instance Instance) {
+	if c.Current.Host == instance.Host {
+		return
+	}
+
+	c.Instances[instance.Host] = instance
+}
+
+func (c *Config) RemoveInstance(instance Instance) {
+	if c.Current.Host == instance.Host {
+		return
+	}
+
+	delete(c.Instances, instance.Host)
 }

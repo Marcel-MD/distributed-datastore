@@ -115,7 +115,7 @@ func connect() {
 	}
 
 	for _, instance := range config.Instances {
-		address := instance.Host + ":" + instance.TcpPort
+		address := instance.Host + instance.TcpPort
 		conn, err := net.Dial("tcp", address)
 		if err != nil {
 			log.Err(err).Msgf("Error connecting to %s", address)

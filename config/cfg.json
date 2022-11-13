@@ -1,25 +1,6 @@
 {
-  "current": {
-    "is_leader": true,
-    "host": "store-0",
-    "http_port": "8080",
-    "tcp_port": "8070",
-    "udp_port": "8060"
-  },
-  "instances": [
-    {
-      "is_leader": false,
-      "host": "store-1",
-      "http_port": "8081",
-      "tcp_port": "8071",
-      "udp_port": "8061"
-    },
-    {
-      "is_leader": false,
-      "host": "store-2",
-      "http_port": "8082",
-      "tcp_port": "8072",
-      "udp_port": "8062"
-    }
-  ]
+  "is_leader": true,
+  "host": "store-0",
+  "http_port": ":8080",
+  "tcp_port": ":8070"
 }
