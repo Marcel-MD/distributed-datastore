@@ -6,7 +6,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Marcel-MD/distributed-datastore/cfg"
 	"github.com/Marcel-MD/distributed-datastore/models"
 	"github.com/Marcel-MD/distributed-datastore/presentation/tcp"
 	"github.com/rs/zerolog/log"
@@ -42,7 +41,7 @@ func GetClient() Client {
 
 		c = &client{
 			addr:            addr,
-			currentInstance: cfg.GetCurrentInstance(),
+			currentInstance: models.GetCurrentInstance(),
 			aliveInstances:  make(map[string]int64),
 			tcpClient:       tcp.GetClient(),
 		}

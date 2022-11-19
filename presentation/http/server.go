@@ -4,8 +4,8 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/Marcel-MD/distributed-datastore/cfg"
 	"github.com/Marcel-MD/distributed-datastore/domain"
+	"github.com/Marcel-MD/distributed-datastore/models"
 	"github.com/Marcel-MD/distributed-datastore/presentation/tcp"
 	"github.com/Marcel-MD/distributed-datastore/presentation/websocket"
 	"github.com/gorilla/mux"
@@ -13,7 +13,7 @@ import (
 )
 
 func ListenAndServe() {
-	currentInstance := cfg.GetCurrentInstance()
+	currentInstance := models.GetCurrentInstance()
 	port := currentInstance.HttpPort
 
 	r := initRouter()

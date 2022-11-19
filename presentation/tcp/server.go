@@ -4,14 +4,13 @@ import (
 	"encoding/json"
 	"net"
 
-	"github.com/Marcel-MD/distributed-datastore/cfg"
 	"github.com/Marcel-MD/distributed-datastore/domain"
 	"github.com/Marcel-MD/distributed-datastore/models"
 	"github.com/rs/zerolog/log"
 )
 
 func ListenAndServe() {
-	currentInstance := cfg.GetCurrentInstance()
+	currentInstance := models.GetCurrentInstance()
 	port := currentInstance.TcpPort
 
 	l, err := net.Listen("tcp", port)
