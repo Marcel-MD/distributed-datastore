@@ -12,8 +12,8 @@ import (
 )
 
 func ListenAndServe() {
-	config := cfg.GetConfig()
-	port := config.Current.HttpPort
+	currentInstance := cfg.GetCurrentInstance()
+	port := currentInstance.HttpPort
 
 	r := initRouter()
 

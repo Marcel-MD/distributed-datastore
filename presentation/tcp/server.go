@@ -10,8 +10,8 @@ import (
 )
 
 func ListenAndServe() {
-	config := cfg.GetConfig()
-	port := config.Current.TcpPort
+	currentInstance := cfg.GetCurrentInstance()
+	port := currentInstance.TcpPort
 
 	l, err := net.Listen("tcp", port)
 	if err != nil {
