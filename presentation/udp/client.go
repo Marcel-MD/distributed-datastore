@@ -6,8 +6,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Marcel-MD/distributed-datastore/cfg"
 	"github.com/Marcel-MD/distributed-datastore/models"
-	"github.com/Marcel-MD/distributed-datastore/presentation/cfg"
 	"github.com/Marcel-MD/distributed-datastore/presentation/tcp"
 	"github.com/rs/zerolog/log"
 )

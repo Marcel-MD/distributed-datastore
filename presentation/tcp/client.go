@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	"github.com/Marcel-MD/distributed-datastore/models"
+	"github.com/Marcel-MD/distributed-datastore/presentation/websocket"
 	"github.com/rs/zerolog/log"
 )
 
@@ -25,8 +26,8 @@ type client struct {
 }
 
 func (c *client) Get(key string) ([]byte, error) {
-	action := Action{
-		Command: GET,
+	action := models.Action{
+		Command: models.GET,
 		Key:     key,
 	}
 
@@ -36,8 +37,8 @@ func (c *client) Get(key string) ([]byte, error) {
 }
 
 func (c *client) Set(key string, value []byte) error {
-	action := Action{
-		Command: SET,
+	action := models.Action{
+		Command: models.SET,
 		Key:     key,
 		Value:   value,
 	}
@@ -48,8 +49,8 @@ func (c *client) Set(key string, value []byte) error {
 }
 
 func (c *client) Update(key string, value []byte) error {
-	action := Action{
-		Command: UPDATE,
+	action := models.Action{
+		Command: models.UPDATE,
 		Key:     key,
 		Value:   value,
 	}
@@ -60,8 +61,8 @@ func (c *client) Update(key string, value []byte) error {
 }
 
 func (c *client) Delete(key string) error {
-	action := Action{
-		Command: DELETE,
+	action := models.Action{
+		Command: models.DELETE,
 		Key:     key,
 	}
 
@@ -70,12 +71,14 @@ func (c *client) Delete(key string) error {
 	return err
 }
 
-func (c *client) broadcast(action Action) ([]byte, error) {
+func (c *client) broadcast(action models.Action) ([]byte, error) {
 	data, err := json.Marshal(action)
 	if err != nil {
 		log.Error().Err(err).Msg("Failed to marshal action")
 		return nil, err
 	}
+
+	websocket.Broadcast(action)
 
 	for _, conn := range c.connections {
 		_, err := conn.Write(data)
@@ -89,7 +92,7 @@ func (c *client) broadcast(action Action) ([]byte, error) {
 			continue
 		}
 
-		if string(buffer[0:n]) == ERROR {
+		if string(buffer[0:n]) == models.ERROR {
 			continue
 		}
 

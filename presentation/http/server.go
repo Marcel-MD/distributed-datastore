@@ -4,9 +4,10 @@ import (
 	"io"
 	"net/http"
 
+	"github.com/Marcel-MD/distributed-datastore/cfg"
 	"github.com/Marcel-MD/distributed-datastore/domain"
-	"github.com/Marcel-MD/distributed-datastore/presentation/cfg"
 	"github.com/Marcel-MD/distributed-datastore/presentation/tcp"
+	"github.com/Marcel-MD/distributed-datastore/presentation/websocket"
 	"github.com/gorilla/mux"
 	"github.com/rs/zerolog/log"
 )
@@ -28,6 +29,18 @@ func initRouter() *mux.Router {
 	s := domain.GetStore()
 
 	c := tcp.GetClient()
+
+	r.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
+		err := websocket.Serve(w, r)
+		if err != nil {
+			log.Error().Err(err).Msg("Error serving websocket")
+			w.WriteHeader(http.StatusInternalServerError)
+			return
+		}
+
+		w.WriteHeader(http.StatusNoContent)
+
+	}).Methods("GET")
 
 	r.HandleFunc("/{key}", func(w http.ResponseWriter, r *http.Request) {
 

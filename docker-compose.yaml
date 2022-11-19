@@ -8,7 +8,6 @@ services:
     ports:
       - "8080:8080"
       - "8070:8070"
-      - "8060:8060"
     depends_on:
       - store-1
       - store-2
@@ -22,7 +21,6 @@ services:
     ports:
       - "8081:8081"
       - "8071:8071"
-      - "8061:8061"
 
   store-2:
     build:
@@ -33,7 +31,6 @@ services:
     ports:
       - "8082:8082"
       - "8072:8072"
-      - "8062:8062"
 
 networks:
   default:
