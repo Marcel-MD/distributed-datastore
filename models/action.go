@@ -1,4 +1,4 @@
-package tcp
+package models
 
 type Action struct {
 	Key     string `json:"key"`

@@ -2,7 +2,6 @@ package main
 
 import (
 	"os"
-	"time"
 
 	"github.com/Marcel-MD/distributed-datastore/presentation/http"
 	"github.com/Marcel-MD/distributed-datastore/presentation/tcp"
@@ -17,15 +16,10 @@ func main() {
 
 	go udp.ListenAndServe()
 
-	time.Sleep(1 * time.Second)
-
-	udp.BroadcastConfig()
-
-	time.Sleep(1 * time.Second)
+	client := udp.GetClient()
+	go client.BroadcastConfig()
 
 	go tcp.ListenAndServe()
-
-	time.Sleep(1 * time.Second)
 
 	http.ListenAndServe()
 }

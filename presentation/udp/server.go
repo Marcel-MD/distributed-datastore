@@ -2,10 +2,9 @@ package udp
 
 import (
 	"encoding/json"
-	"fmt"
 	"net"
 
-	"github.com/Marcel-MD/distributed-datastore/presentation/cfg"
+	"github.com/Marcel-MD/distributed-datastore/models"
 	"github.com/rs/zerolog/log"
 )
 
@@ -27,25 +26,27 @@ func ListenAndServe() {
 	}
 	defer conn.Close()
 
-	config := cfg.GetConfig()
+	client := GetClient()
 
 	for {
 		buf := make([]byte, 1024)
-		n, addr, err := conn.ReadFromUDP(buf)
+		n, _, err := conn.ReadFromUDP(buf)
 		if err != nil {
 			log.Err(err).Msg("Error reading from UDP")
 			continue
 		}
 
-		var instance cfg.Instance
+		var instance models.Instance
 		err = json.Unmarshal(buf[:n], &instance)
 		if err != nil {
 			log.Err(err).Msg("Error unmarshaling instance")
 			continue
 		}
 
-		config.AddInstance(instance)
+		if client.HasInstance(instance.Host) {
+			continue
+		}
 
-		log.Info().Msg(fmt.Sprintf("Received config %s from %s", instance.Host, addr.String()))
+		client.AddInstance(instance)
 	}
 }

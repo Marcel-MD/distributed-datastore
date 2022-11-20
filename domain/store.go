@@ -12,6 +12,7 @@ type Store interface {
 	Set(key string, value []byte) error
 	Update(key string, value []byte) error
 	Delete(key string) error
+	GetKeys() []string
 }
 
 type store struct {
@@ -75,4 +76,14 @@ func (s *store) Delete(key string) error {
 	}
 
 	return errors.New("key not found")
+}
+
+func (s *store) GetKeys() []string {
+	keys := make([]string, 0, len(s.data))
+
+	for k := range s.data {
+		keys = append(keys, k)
+	}
+
+	return keys
 }
