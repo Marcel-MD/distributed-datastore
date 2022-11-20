@@ -83,6 +83,7 @@ func (c *client) checkInstances() {
 		if time.Now().Unix()-pingTime > 10 {
 			delete(c.aliveInstances, host)
 			c.tcpClient.RemoveConnection(host)
+			c.tcpClient.SyncData()
 
 			log.Info().Msgf("Instance %s is dead", host)
 		}

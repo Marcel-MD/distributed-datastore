@@ -6,6 +6,7 @@ import (
 	"net"
 	"sync"
 
+	"github.com/Marcel-MD/distributed-datastore/domain"
 	"github.com/Marcel-MD/distributed-datastore/models"
 	"github.com/Marcel-MD/distributed-datastore/presentation/websocket"
 	"github.com/rs/zerolog/log"
@@ -19,6 +20,7 @@ type Client interface {
 
 	AddConnection(instance models.Instance)
 	RemoveConnection(host string)
+	SyncData()
 }
 
 type client struct {
@@ -140,4 +142,18 @@ func GetClient() Client {
 	})
 
 	return c
+}
+
+func (c *client) SyncData() {
+	s := domain.GetStore()
+	keys := s.GetKeys()
+
+	for _, key := range keys {
+		value, err := s.Get(key)
+		if err != nil {
+			continue
+		}
+
+		c.Set(key, value)
+	}
 }
